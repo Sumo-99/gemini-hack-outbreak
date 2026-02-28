@@ -1,3 +1,4 @@
+import asyncio
 import json
 from enum import Enum
 from typing import Dict, List, Any
@@ -46,6 +47,12 @@ manager = ConnectionManager()
 @ws_router.websocket("/ws/{game_id}/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str, client_id: str):
     await manager.connect(game_id, websocket)
+
+    # Start the phase engine on the first client connection
+    if len(manager.active_connections.get(game_id, [])) == 1:
+        from src.engine.phase_manager import PhaseEngine
+        asyncio.create_task(PhaseEngine(game_id).execute_phase())
+
     try:
         while True:
             data = await websocket.receive_text()
