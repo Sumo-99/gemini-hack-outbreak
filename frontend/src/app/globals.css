@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-terminal-bg: #080808;
+  --color-terminal-green: #00FF41;
+  --color-terminal-amber: #C84B11;
+  --color-terminal-red: #8B0000;
+  --color-terminal-dim: #2e3532;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-terminal-bg);
+    color: var(--color-terminal-green);
+    font-family: "Courier New", Courier, monospace;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+/* Scanline Effect Overlay */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.2)
+  );
+  background-size: 100% 4px;
+  opacity: 0.6;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-terminal-bg);
+  border-left: 1px solid var(--color-terminal-dim);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-terminal-dim);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-terminal-green);
+}
