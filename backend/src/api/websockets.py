@@ -1,58 +1,63 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from typing import Dict, List
 import json
+from enum import Enum
+from typing import Dict, List, Any
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 ws_router = APIRouter()
 
+class EventType(str, Enum):
+    NEW_MESSAGE = "new_message"
+    GM_EVENT = "gm_event"
+    PHASE_CHANGE = "phase_change"
+    NPC_TYPING = "npc_typing"
+    PLAYER_MESSAGE = "player_message" # Inbound from client
+    VOTE = "vote"                     # Inbound from client
+
 class ConnectionManager:
+    """Manages active WebSockets and handles real-time broadcasts per game session."""
     def __init__(self):
-        # Maps gameId to a list of active websocket connections
+        # game_id -> list of active WebSocket connections
         self.active_connections: Dict[str, List[WebSocket]] = {}
 
-    async def connect(self, websocket: WebSocket, game_id: str):
+    async def connect(self, game_id: str, websocket: WebSocket):
         await websocket.accept()
         if game_id not in self.active_connections:
             self.active_connections[game_id] = []
         self.active_connections[game_id].append(websocket)
-        print(f"Client connected to game {game_id}")
 
-    def disconnect(self, websocket: WebSocket, game_id: str):
+    def disconnect(self, game_id: str, websocket: WebSocket):
         if game_id in self.active_connections:
-            self.active_connections[game_id].remove(websocket)
+            if websocket in self.active_connections[game_id]:
+                self.active_connections[game_id].remove(websocket)
             if not self.active_connections[game_id]:
                 del self.active_connections[game_id]
-            print(f"Client disconnected from game {game_id}")
 
-    async def broadcast_to_game(self, game_id: str, message: dict):
+    async def broadcast(self, game_id: str, event_type: EventType, data: Any):
         if game_id in self.active_connections:
-            # Broadcast the JSON message to all clients on this game session
-            text_data = json.dumps(message)
+            payload = json.dumps({"type": event_type.value, "data": data})
             for connection in self.active_connections[game_id]:
                 try:
-                    await connection.send_text(text_data)
-                except Exception as e:
-                    print(f"Failed sending to a websocket: {e}")
+                    await connection.send_text(payload)
+                except Exception:
+                    pass
 
 manager = ConnectionManager()
 
-@ws_router.websocket("/ws/{game_id}")
-async def websocket_endpoint(websocket: WebSocket, game_id: str):
-    """
-    WebSocket endpoint for real-time game interaction.
-    """
-    await manager.connect(websocket, game_id)
+@ws_router.websocket("/ws/{game_id}/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, game_id: str, client_id: str):
+    await manager.connect(game_id, websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            # Parse incoming event (e.g. chat message, vote, player action)
             try:
                 event = json.loads(data)
-                print(f"Received event on game {game_id}:", event)
                 
-                # TODO: Route event to the PhaseEngine to process the action
-                
+                # Setup simple routing for testing
+                # In phase 4, this gets routed to the Phase Event Loop
+                if event.get("type") == EventType.PLAYER_MESSAGE.value:
+                    await manager.broadcast(game_id, EventType.NEW_MESSAGE, event.get("data"))
             except json.JSONDecodeError:
-                print("Invalid JSON received.")
-                
+                # Ignore malformed JSON
+                pass
     except WebSocketDisconnect:
-        manager.disconnect(websocket, game_id)
+        manager.disconnect(game_id, websocket)
