@@ -38,6 +38,9 @@ class NPC(BaseModel):
     pulse: int = 70
     trust: str = "neutral"
     health: int = 100
+    speech_pattern: str = ""
+    backstory: str = ""
+    relationships: Dict[str, str] = Field(default_factory=dict)
     gemini_history: List[Dict[str, Any]] = Field(default_factory=list)
 
 class GameMaster(BaseModel):
@@ -56,6 +59,10 @@ class Config(BaseModel):
     paranoid_mode: bool = False
     active_npcs: bool = True
 
+class WorldGenState(BaseModel):
+    setting: str = ""
+    opening_narrative: str = ""
+
 class GameState(BaseModel):
     game_id: str
     round: int = 1
@@ -66,4 +73,5 @@ class GameState(BaseModel):
     gamemaster: GameMaster = Field(default_factory=GameMaster)
     conversations: Conversations = Field(default_factory=Conversations)
     safe_house_log: List[Dict[str, Any]] = Field(default_factory=list)
+    world_gen: Optional[WorldGenState] = None
     outcome: Optional[str] = None
