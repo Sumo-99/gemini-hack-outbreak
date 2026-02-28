@@ -1,14 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SafeHouseLog from "../components/SafeHouseLog";
 import CameraFeeds from "../components/CameraFeeds";
 import PrivateChat from "../components/PrivateChat";
 import SurvivorStatus from "../components/SurvivorStatus";
 import VotingOverlay from "../components/overlays/VotingOverlay";
+import { useGame } from "@/context/GameContext";
 
 export default function Home() {
   const [showVoting, setShowVoting] = useState(false);
+  const { connect } = useGame();
+
+  useEffect(() => {
+    // For local development testing, hardcode a game and client ID
+    connect("demo_game_001", "player_" + Math.floor(Math.random() * 1000));
+  }, [connect]);
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-[var(--color-terminal-bg)] text-[var(--color-terminal-green)] flex relative">

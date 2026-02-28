@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GameProvider } from "@/context/GameContext";
 
 export const metadata: Metadata = {
   title: "OUTBREAK | Term Link Secure",
@@ -14,8 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="antialiased min-h-screen bg-[var(--color-terminal-bg)] text-[var(--color-terminal-green)] font-mono selection:bg-[var(--color-terminal-green)] selection:text-[var(--color-terminal-bg)]">
-        <div className="scanlines pointer-events-none" aria-hidden="true" />
-        {children}
+        <GameProvider>
+          <div className="scanlines pointer-events-none" aria-hidden="true" />
+          {children}
+        </GameProvider>
       </body>
     </html>
   );

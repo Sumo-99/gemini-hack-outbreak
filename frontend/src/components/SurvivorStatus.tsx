@@ -1,4 +1,5 @@
 import React from "react";
+import { useGame } from "@/context/GameContext";
 
 function SurvivorCard({ name, status, pulse, pulseColor, hrStatus, trust }: any) {
     return (
@@ -33,6 +34,11 @@ function SurvivorCard({ name, status, pulse, pulseColor, hrStatus, trust }: any)
 }
 
 export default function SurvivorStatus({ onInitiateVote }: { onInitiateVote?: () => void }) {
+    const { gameState } = useGame();
+
+    // Fallback UI if backend isn't connected yet
+    const npcs = gameState.npcs.length > 0 ? gameState.npcs : [];
+
     return (
         <div className="flex flex-col h-full border-l border-[var(--color-terminal-dim)] bg-[var(--color-terminal-bg)]">
             <div className="p-4 border-b border-[var(--color-terminal-dim)]">
@@ -48,46 +54,38 @@ export default function SurvivorStatus({ onInitiateVote }: { onInitiateVote?: ()
                     hrStatus="NORMAL"
                     trust="HIGH"
                 />
-                <SurvivorCard
-                    name="Marcus"
-                    status="ALIVE"
-                    pulse={82}
-                    pulseColor="bg-yellow-500"
-                    hrStatus="ELEVATED"
-                    trust="UNKNOWN"
-                />
-                <SurvivorCard
-                    name="Dax"
-                    status="TERMINATED"
-                    pulse={0}
-                    pulseColor="bg-[var(--color-terminal-red)]"
-                    hrStatus="FLATLINE"
-                    trust="LOW"
-                />
-                <SurvivorCard
-                    name="Elena"
-                    status="ALIVE"
-                    pulse={45}
-                    pulseColor="bg-[var(--color-terminal-green)]"
-                    hrStatus="LOW"
-                    trust="MODERATE"
-                />
+
+                {npcs.map(npc => (
+                    <SurvivorCard
+                        key={npc.id || npc.name}
+                        name={npc.name}
+                        status={npc.is_eliminated ? "TERMINATED" : "ALIVE"}
+                        pulse={npc.is_eliminated ? 0 : (npc.pulse || 75)}
+                        pulseColor={npc.is_eliminated ? "bg-[var(--color-terminal-red)]" : "bg-yellow-500"}
+                        hrStatus={npc.pulse && npc.pulse > 90 ? "ELEVATED" : "NORMAL"}
+                        trust={(npc.trust || "UNKNOWN").toUpperCase()}
+                    />
+                ))}
             </div>
 
             <div className="p-4 border-t border-[var(--color-terminal-dim)] space-y-4">
                 <div className="text-xs text-gray-400 flex flex-col gap-1">
-                    <div className="flex justify-between"><span>ROUND:</span> <span className="text-[var(--color-terminal-amber)]">03</span></div>
-                    <div className="flex justify-between"><span>REMAINING:</span> <span>02</span></div>
-                    <div className="flex justify-between mt-2 pt-2 border-t border-[var(--color-terminal-dim)] text-[var(--color-terminal-amber)]">
-                        <span>PHASE:</span> <span>INTERROGATION</span>
+                    <div className="flex justify-between"><span>ROUND:</span> <span className="text-[var(--color-terminal-amber)]">{(gameState.round || 1).toString().padStart(2, '0')}</span></div>
+                    <div className="flex justify-between"><span>REMAINING:</span> <span>{npcs.filter(n => !n.is_eliminated).length + 1}</span></div>
+                    <div className="flex justify-between mt-2 pt-2 border-t border-[var(--color-terminal-dim)] text-[var(--color-terminal-amber)] uppercase">
+                        <span>PHASE:</span> <span>{gameState.phase || "SETUP"}</span>
                     </div>
                 </div>
 
                 <button
                     onClick={onInitiateVote}
-                    className="w-full border border-[var(--color-terminal-dim)] text-gray-400 py-3 text-sm tracking-widest hover:border-[var(--color-terminal-amber)] hover:text-[var(--color-terminal-amber)] transition-colors uppercase font-bold"
+                    disabled={gameState.phase !== "voting"}
+                    className={`w-full border py-3 text-sm tracking-widest uppercase font-bold transition-colors ${gameState.phase === "voting"
+                            ? "border-[var(--color-terminal-dim)] text-gray-400 hover:border-[var(--color-terminal-amber)] hover:text-[var(--color-terminal-amber)]"
+                            : "border-[#1a1a1a] text-[#333] cursor-not-allowed"
+                        }`}
                 >
-                    Initiate Vote
+                    {gameState.phase === "voting" ? "Initiate Vote" : "Voting Offline"}
                 </button>
             </div>
         </div>
