@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class GeminiClient:
     """Wrapper around google-generativeai to handle rate limits, retries, and fallbacks."""
-    def __init__(self, model_name="gemini-1.5-pro", mock_mode=False):
+    def __init__(self, model_name="gemini-2.5-flash", mock_mode=False):
         api_key = os.getenv("GEMINI_API_KEY")
         if not mock_mode and api_key:
             genai.configure(api_key=api_key)

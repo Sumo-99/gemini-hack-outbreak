@@ -12,7 +12,7 @@ class NPCAgent:
     async def generate_broadcast_message(self, state: GameState) -> str:
         """Generates a message for the broadcast chat phase."""
         prompt = ContextBuilder.build_npc_prompt(self.npc, state)
-        prompt += "\n\nWrite your next response addressing the group in 2-3 sentences based on the context above."
+        prompt += "\n\nWrite your next response addressing the group in 1-2 standard sentences. Be concise but conversational."
         
         response = await self.client.generate_response(prompt, fallback=f"[{self.npc.name} is quiet]")
         return response

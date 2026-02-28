@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useGame } from "@/context/GameContext";
 
 export default function PrivateChat() {
-    const { messages, sendMessage } = useGame();
+    const { messages, sendMessage, typingState } = useGame();
     const [input, setInput] = useState("");
 
     const handleSend = () => {
@@ -51,6 +51,12 @@ export default function PrivateChat() {
                         </div>
                     );
                 })}
+
+                {typingState && (
+                    <div className="text-xs text-[var(--color-terminal-dim)] font-mono animate-pulse uppercase tracking-wider mt-4">
+                        {typingState} IS GENERATING RESPONSE_
+                    </div>
+                )}
             </div>
 
             {/* Input Area */}

@@ -4,7 +4,10 @@ export default function CameraFeeds() {
     return (
         <div className="grid grid-cols-2 gap-4 p-4 border-b border-[var(--color-terminal-dim)] min-h-[250px] relative">
             {/* Feed 1 */}
-            <div className="relative border border-[var(--color-terminal-dim)] bg-black/50 overflow-hidden flex flex-col justify-end">
+            <div
+                className="relative border border-[var(--color-terminal-dim)] bg-black/50 overflow-hidden flex flex-col justify-end"
+                style={{ backgroundImage: "url('/cam1.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+            >
                 {/* Background placeholder scanline tint */}
                 <div className="absolute inset-0 bg-[#00FF41] opacity-[0.03] pointer-events-none" />
 
@@ -18,7 +21,10 @@ export default function CameraFeeds() {
             </div>
 
             {/* Feed 2 */}
-            <div className="relative border border-[var(--color-terminal-dim)] bg-black/50 overflow-hidden flex flex-col justify-end">
+            <div
+                className="relative border border-[var(--color-terminal-dim)] bg-black/50 overflow-hidden flex flex-col justify-end"
+                style={{ backgroundImage: "url('/cam2.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+            >
                 <div className="absolute inset-0 bg-[#00FF41] opacity-[0.03] pointer-events-none" />
 
                 <div className="relative z-10 p-2 text-xs flex justify-between items-center bg-black/60 border-t border-[var(--color-terminal-dim)]">

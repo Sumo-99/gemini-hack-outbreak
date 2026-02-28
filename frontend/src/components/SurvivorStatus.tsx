@@ -79,13 +79,13 @@ export default function SurvivorStatus({ onInitiateVote }: { onInitiateVote?: ()
 
                 <button
                     onClick={onInitiateVote}
-                    disabled={gameState.phase !== "voting"}
-                    className={`w-full border py-3 text-sm tracking-widest uppercase font-bold transition-colors ${gameState.phase === "voting"
-                            ? "border-[var(--color-terminal-dim)] text-gray-400 hover:border-[var(--color-terminal-amber)] hover:text-[var(--color-terminal-amber)]"
-                            : "border-[#1a1a1a] text-[#333] cursor-not-allowed"
+                    disabled={gameState.phase !== "broadcast"}
+                    className={`w-full border py-3 text-sm tracking-widest uppercase font-bold transition-colors ${gameState.phase === "broadcast"
+                        ? "border-[var(--color-terminal-dim)] text-gray-400 hover:border-[var(--color-terminal-amber)] hover:text-[var(--color-terminal-amber)]"
+                        : "border-[#1a1a1a] text-[#333] cursor-not-allowed"
                         }`}
                 >
-                    {gameState.phase === "voting" ? "Initiate Vote" : "Voting Offline"}
+                    {gameState.phase === "broadcast" ? "Initiate Vote" : "Voting Offline"}
                 </button>
             </div>
         </div>

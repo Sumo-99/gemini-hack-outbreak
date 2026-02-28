@@ -1,0 +1,10 @@
+CRITICAL WS ERROR: a coroutine was expected, got <_GatheringFuture pending>
+Traceback (most recent call last):
+  File "C:\Data\Projects\gemini-hack-outbreak\backend\src\api\websockets.py", line 118, in websocket_endpoint
+    task = asyncio.create_task(asyncio.gather(*tasks))
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 410, in create_task
+    task = loop.create_task(coro, name=name)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 475, in create_task
+    task = tasks.Task(coro, loop=self, name=name, context=context, **kwargs)
+TypeError: a coroutine was expected, got <_GatheringFuture pending>
+
