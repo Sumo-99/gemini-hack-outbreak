@@ -3,10 +3,10 @@ import React from "react";
 import { useGame } from "@/context/GameContext";
 
 export default function SafeHouseLog() {
-    const { systemLogs, messages } = useGame();
+    const { systemLogs } = useGame();
 
-    // Interleave messages by timestamp (simulated by array index initially for demo)
-    const combinedLog = [...systemLogs, ...messages].slice(-50); // Keep last 50
+    // SafeHouseLog only shows system/GM events — chat messages belong in PrivateChat
+    const combinedLog = systemLogs.slice(-50);
 
     return (
         <div className="flex flex-col h-full border-r border-[var(--color-terminal-dim)] bg-[var(--color-terminal-bg)]">

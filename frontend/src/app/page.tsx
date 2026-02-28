@@ -13,8 +13,14 @@ export default function Home() {
   const { connect } = useGame();
 
   useEffect(() => {
-    // For local development testing, hardcode a game and client ID
-    connect("demo_game_001", "player_" + Math.floor(Math.random() * 1000));
+    const clientId = "player_" + Math.floor(Math.random() * 1000);
+    fetch("http://localhost:8000/api/game/create", { method: "POST" })
+      .then((res) => res.json())
+      .then((data) => {
+        connect(data.game_id, clientId);
+        return fetch(`http://localhost:8000/api/game/${data.game_id}/start`, { method: "POST" });
+      })
+      .catch((err) => console.error("Failed to initialize game:", err));
   }, [connect]);
 
   return (

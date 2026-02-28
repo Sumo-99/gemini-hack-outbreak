@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from "react";
 
 type Message = {
   id: string;
@@ -50,7 +50,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
-  const connect = (gameId: string, clientId: string) => {
+  const connect = useCallback((gameId: string, clientId: string) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     const wsUrl = `ws://localhost:8000/ws/${gameId}/${clientId}`;
@@ -77,7 +77,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     };
 
     wsRef.current = ws;
-  };
+  }, []);
 
   const handleServerEvent = (payload: any) => {
     const { type, data } = payload;
@@ -105,6 +105,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             id: Math.random().toString(),
             sender: "SYSTEM",
             text: `>> PHASE TRANSITION: ${data.phase.toUpperCase()}`,
+            type: "gm_event"
+        }]);
+    } else if (type === "vote") {
+        setSystemLogs((prev) => [...prev, {
+            id: Math.random().toString(),
+            sender: "SYSTEM",
+            text: `>> VOTE CAST: ${data.sender} → ${data.vote}`,
             type: "gm_event"
         }]);
     }

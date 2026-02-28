@@ -52,10 +52,15 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str, client_id: str)
             try:
                 event = json.loads(data)
                 
-                # Setup simple routing for testing
-                # In phase 4, this gets routed to the Phase Event Loop
+                # Route player_message to all OTHER clients only (sender already sees it optimistically)
                 if event.get("type") == EventType.PLAYER_MESSAGE.value:
-                    await manager.broadcast(game_id, EventType.NEW_MESSAGE, event.get("data"))
+                    payload = json.dumps({"type": EventType.NEW_MESSAGE.value, "data": {**event.get("data", {}), "sender": client_id}})
+                    for connection in manager.active_connections.get(game_id, []):
+                        if connection is not websocket:
+                            try:
+                                await connection.send_text(payload)
+                            except Exception:
+                                pass
             except json.JSONDecodeError:
                 # Ignore malformed JSON
                 pass
